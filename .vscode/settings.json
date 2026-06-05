@@ -1,0 +1,8 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^npm install -D @playwright/test typescript$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}
