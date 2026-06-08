@@ -28,4 +28,8 @@ export class LoginPage {
   async expectLockedOutError() {
     await expect(this.errorMessage).toContainText('Sorry, this user has been locked out.');
   }
+
+  async expectErrorContains(message: string) {
+    await expect(this.errorMessage).toContainText(message);
+  }
 }
