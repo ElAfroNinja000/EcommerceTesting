@@ -8,6 +8,10 @@
     "test:headed": "playwright test --headed",
     "test:ui": "playwright test --ui",
     "test:debug": "playwright test --debug",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:auth": "playwright test --grep @auth",
+    "test:checkout": "playwright test --grep @checkout",
+    "test:regression": "playwright test --grep @regression",
     "report": "playwright show-report"
   },
   "keywords": [],

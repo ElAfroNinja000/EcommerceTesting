@@ -39,7 +39,7 @@ test.describe('SauceDemo POM smoke tests', () => {
   });
 
   for (const profile of loginProfiles) {
-    test(profile.name, async () => {
+    test(`${profile.name} @auth @smoke`, async () => {
       await loginPage.login(profile.username, profile.password);
 
       if (profile.expected === 'success') {
@@ -51,7 +51,7 @@ test.describe('SauceDemo POM smoke tests', () => {
     });
   }
 
-  test('critical path: cart and checkout completion', async () => {
+  test('critical path: cart and checkout completion @checkout @smoke @regression', async () => {
     await loginPage.login(USERNAME, PASSWORD);
     await inventoryPage.expectLoaded();
 
@@ -65,7 +65,7 @@ test.describe('SauceDemo POM smoke tests', () => {
     await inventoryPage.expectCheckoutComplete();
   });
 
-  test('critical path: add and remove backpack from cart', async () => {
+  test('critical path: add and remove backpack from cart @cart @smoke @regression', async () => {
     await loginPage.login(USERNAME, PASSWORD);
     await inventoryPage.expectLoaded();
 
@@ -75,4 +75,5 @@ test.describe('SauceDemo POM smoke tests', () => {
     await inventoryPage.removeBackpackFromCart();
     await inventoryPage.expectEmptyCartBadge();
   });
+
 });
