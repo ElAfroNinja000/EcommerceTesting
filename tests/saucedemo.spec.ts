@@ -2,7 +2,6 @@ import { test } from '@playwright/test';
 import { InventoryPage } from './pages/inventory.page';
 import { LoginPage } from './pages/login.page';
 
-const USERNAME = 'standard_user';
 const PASSWORD = 'secret_sauce';
 
 const loginProfiles = [
@@ -28,7 +27,10 @@ const loginProfiles = [
   },
 ];
 
-test.describe('SauceDemo POM smoke tests', () => {
+test.describe('Auth @auth @smoke', () => {
+  // Ces tests gèrent leur propre login — ils ne doivent pas hériter du storageState
+  test.use({ storageState: { cookies: [], origins: [] } });
+
   let loginPage: LoginPage;
   let inventoryPage: InventoryPage;
 
@@ -39,7 +41,7 @@ test.describe('SauceDemo POM smoke tests', () => {
   });
 
   for (const profile of loginProfiles) {
-    test(`${profile.name} @auth @smoke`, async () => {
+    test(profile.name, async () => {
       await loginPage.login(profile.username, profile.password);
 
       if (profile.expected === 'success') {
@@ -50,11 +52,36 @@ test.describe('SauceDemo POM smoke tests', () => {
       await loginPage.expectErrorContains(profile.errorMessage);
     });
   }
+});
 
-  test('critical path: cart and checkout completion @checkout @smoke @regression', async () => {
-    await loginPage.login(USERNAME, PASSWORD);
+test.describe('Cart @cart @smoke @regression', () => {
+  let inventoryPage: InventoryPage;
+
+  test.beforeEach(async ({ page }) => {
+    inventoryPage = new InventoryPage(page);
+    await page.goto('/inventory.html');
     await inventoryPage.expectLoaded();
+  });
 
+  test('add and remove backpack from cart', async () => {
+    await inventoryPage.addBackpackToCart();
+    await inventoryPage.expectCartCount('1');
+
+    await inventoryPage.removeBackpackFromCart();
+    await inventoryPage.expectEmptyCartBadge();
+  });
+});
+
+test.describe('Checkout @checkout @smoke @regression', () => {
+  let inventoryPage: InventoryPage;
+
+  test.beforeEach(async ({ page }) => {
+    inventoryPage = new InventoryPage(page);
+    await page.goto('/inventory.html');
+    await inventoryPage.expectLoaded();
+  });
+
+  test('critical path: cart and checkout completion', async () => {
     await inventoryPage.addBackpackToCart();
     await inventoryPage.expectCartCount('1');
 
@@ -64,16 +91,4 @@ test.describe('SauceDemo POM smoke tests', () => {
     await inventoryPage.finishCheckout();
     await inventoryPage.expectCheckoutComplete();
   });
-
-  test('critical path: add and remove backpack from cart @cart @smoke @regression', async () => {
-    await loginPage.login(USERNAME, PASSWORD);
-    await inventoryPage.expectLoaded();
-
-    await inventoryPage.addBackpackToCart();
-    await inventoryPage.expectCartCount('1');
-
-    await inventoryPage.removeBackpackFromCart();
-    await inventoryPage.expectEmptyCartBadge();
-  });
-
 });
