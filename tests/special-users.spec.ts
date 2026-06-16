@@ -49,9 +49,19 @@ test.describe('error_user @special-users @regression', () => {
     await inventoryPage.expectLoaded();
   });
 
-  test('adding backpack to cart fails silently — cart badge does not appear', async () => {
+  test('adding backpack to cart succeeds — badge updates to 1', async () => {
+    // error_user CAN add to cart; the badge updates normally.
     await inventoryPage.addBackpackToCart();
-    // error_user: the "Add to cart" button click does not register in the cart
-    await inventoryPage.expectEmptyCartBadge();
+    await inventoryPage.expectCartCount('1');
+  });
+
+  test('removing backpack from cart is broken — badge stays at 1', async () => {
+    // Known error_user bug: the "Remove" button click does not register,
+    // so the item stays in the cart and the badge keeps showing "1".
+    await inventoryPage.addBackpackToCart();
+    await inventoryPage.expectCartCount('1');
+
+    await inventoryPage.removeBackpackFromCart();
+    await inventoryPage.expectCartCount('1');
   });
 });
