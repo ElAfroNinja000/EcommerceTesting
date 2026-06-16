@@ -16,6 +16,7 @@ export class InventoryPage {
   readonly continueButton: Locator;
   readonly finishButton: Locator;
   readonly completeHeader: Locator;
+  readonly checkoutError: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -33,6 +34,7 @@ export class InventoryPage {
     this.continueButton = page.locator('[data-test="continue"]');
     this.finishButton = page.locator('[data-test="finish"]');
     this.completeHeader = page.locator('[data-test="complete-header"]');
+    this.checkoutError = page.locator('[data-test="error"]');
   }
 
   async expectLoaded() {
@@ -85,5 +87,17 @@ export class InventoryPage {
 
   async expectEmptyCartBadge() {
     await expect(this.cartBadge).toHaveCount(0);
+  }
+
+  async submitCheckoutFormPartial(fields: { firstName?: string; lastName?: string; postalCode?: string }) {
+    if (fields.firstName !== undefined) await this.firstNameInput.fill(fields.firstName);
+    if (fields.lastName !== undefined) await this.lastNameInput.fill(fields.lastName);
+    if (fields.postalCode !== undefined) await this.postalCodeInput.fill(fields.postalCode);
+    await this.continueButton.click();
+  }
+
+  async expectCheckoutErrorContains(message: string) {
+    await expect(this.checkoutError).toBeVisible();
+    await expect(this.checkoutError).toContainText(message);
   }
 }
