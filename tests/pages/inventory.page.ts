@@ -8,6 +8,7 @@ export class InventoryPage {
   readonly removeBackpackButton: Locator;
   readonly sortDropdown: Locator;
   readonly inventoryItemNames: Locator;
+  readonly inventoryItemPrices: Locator;
   readonly shoppingCartLink: Locator;
   readonly checkoutButton: Locator;
   readonly firstNameInput: Locator;
@@ -16,6 +17,8 @@ export class InventoryPage {
   readonly continueButton: Locator;
   readonly finishButton: Locator;
   readonly completeHeader: Locator;
+  readonly addToCartButton: Locator;
+  readonly backToProductsButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -25,6 +28,7 @@ export class InventoryPage {
     this.removeBackpackButton = page.locator('[data-test="remove-sauce-labs-backpack"]');
     this.sortDropdown = page.locator('[data-test="product-sort-container"]');
     this.inventoryItemNames = page.locator('[data-test="inventory-item-name"]');
+    this.inventoryItemPrices = page.locator('[data-test="inventory-item-price"]');
     this.shoppingCartLink = page.locator('[data-test="shopping-cart-link"]');
     this.checkoutButton = page.locator('[data-test="checkout"]');
     this.firstNameInput = page.locator('[data-test="firstName"]');
@@ -33,6 +37,8 @@ export class InventoryPage {
     this.continueButton = page.locator('[data-test="continue"]');
     this.finishButton = page.locator('[data-test="finish"]');
     this.completeHeader = page.locator('[data-test="complete-header"]');
+    this.addToCartButton = page.locator('[data-test^="add-to-cart"]');
+    this.backToProductsButton = page.locator('[data-test="back-to-products"]');
   }
 
   async expectLoaded() {
@@ -85,5 +91,26 @@ export class InventoryPage {
 
   async expectEmptyCartBadge() {
     await expect(this.cartBadge).toHaveCount(0);
+  }
+
+  async getPricesAsNumbers(): Promise<number[]> {
+    const rawPrices = await this.inventoryItemPrices.allTextContents();
+    return rawPrices.map((price) => parseFloat(price.replace('$', '')));
+  }
+
+  async clickFirstItem() {
+    await this.inventoryItemNames.first().click();
+  }
+
+  async expectOnItemPage() {
+    await expect(this.page).toHaveURL(/.*inventory-item\.html/);
+  }
+
+  async expectAddToCartButtonVisible() {
+    await expect(this.addToCartButton).toBeVisible();
+  }
+
+  async goBackToInventory() {
+    await this.backToProductsButton.click();
   }
 }
